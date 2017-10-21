@@ -46,7 +46,8 @@ demo地址：https://github.com/earthWo/ZFLocalFileTransferService
 #### 发送相应的消息：
 
 ```
-SocketConnect.get().sendTextMessage(socketId,"消息内容");                         SocketConnect.get().sendFileMessage(connector.getSocketId(),request.getFilePath());
+SocketConnect.get().sendTextMessage(socketId,"消息内容");
+SocketConnect.get().sendFileMessage(connector.getSocketId(),request.getFilePath());
 ```
 
 #### 目前支持的消息类型：
