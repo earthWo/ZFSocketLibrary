@@ -1,8 +1,9 @@
 package socketconnect.con;
 
+import socketconnect.model.Connecter;
+
 import java.util.HashMap;
 import java.util.Map;
-import socketconnect.model.Connecter;
 
 
 /**

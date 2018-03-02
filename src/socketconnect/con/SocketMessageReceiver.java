@@ -1,6 +1,8 @@
 package socketconnect.con;
 
 
+import socketconnect.model.Connecter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -9,9 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import socketconnect.model.Connecter;
 
 /**
  * Created by wuzefeng on 2017/10/13.
@@ -106,6 +105,7 @@ public class SocketMessageReceiver {
                     int len;
                     if (mSocket != null && (len = inputStream.read(buffer)) != -1) {
                         mReceiveQueue.put(Arrays.copyOf(buffer, len));
+                        System.out.println("正在接受数据");
                         if(SocketHeartSender.get(mConnecter.getSocketId())!=null)
                             SocketHeartSender.get(mConnecter.getSocketId()).updateReceiveTime();
                     }

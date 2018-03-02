@@ -1,5 +1,15 @@
 package socketconnect.con;
 
+import com.google.protobuf.ByteString;
+import socketconnect.callback.MessageType;
+import socketconnect.callback.SocketDataType;
+import socketconnect.exception.SocketException;
+import socketconnect.message.SocketMessage;
+import socketconnect.message.SocketTextMessage;
+import socketconnect.model.Connecter;
+import socketconnect.proto.SocketDataProtos;
+import socketconnect.utils.ByteUtil;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -7,14 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
-import socketconnect.callback.MessageType;
-import socketconnect.callback.SocketDataType;
-import socketconnect.exception.SocketException;
-import socketconnect.message.SocketData;
-import socketconnect.message.SocketMessage;
-import socketconnect.message.SocketTextMessage;
-import socketconnect.model.Connecter;
-import socketconnect.utils.ByteUtil;
 
 /**
  * Created by wuzefeng on 2017/10/13.
@@ -90,7 +92,13 @@ public class SocketMessageSender {
 
     private byte[][] getBytesByMessage(SocketMessage message){
         byte[][]ms;
-        byte[] messageByte = new SocketData(message).toByteArray();
+        SocketDataProtos.SocketData socketData=SocketDataProtos.SocketData.newBuilder()
+                .setMessageId(message.getMessageId())
+                .setMessageType(message.getMessageType())
+                .setText(message.getText())
+                .setData(ByteString.copyFrom(message.getData()))
+                .build();
+        byte[]messageByte=socketData.toByteArray();
         int messageLength=messageByte.length;
         int len = 0;
         //普通消息

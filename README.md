@@ -56,11 +56,22 @@ SocketConnect.get().sendFileMessage(connector.getSocketId(),request.getFilePath(
 
 #### 暂时存在的问题
 
-传输的速度比较慢，而且能够传输的文件较小，这些会在后续版本中解决。
+传输的速度比较慢，传输大文件稳定性有待提高
 
 ### License
 
-BSD, part MIT and Apache 2.0. See the [LICENSE](https://github.com/bumptech/glide/blob/master/LICENSE) file for details.
+Copyright 2017 wuzefeng
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 ## 
 

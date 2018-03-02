@@ -1,16 +1,11 @@
 package socketconnect.con;
 
 
-import com.alibaba.fastjson.JSON;
+import com.google.protobuf.InvalidProtocolBufferException;
 import socketconnect.callback.MessageType;
 import socketconnect.callback.SocketDataType;
-import socketconnect.message.SocketData;
-import socketconnect.message.SocketFileMessage;
-import socketconnect.message.SocketImageMessage;
-import socketconnect.message.SocketMessage;
-import socketconnect.message.SocketTextMessage;
-import socketconnect.message.SocketVideoMessage;
-import socketconnect.message.SocketVoiceMessage;
+import socketconnect.message.*;
+import socketconnect.proto.SocketDataProtos;
 import socketconnect.utils.ByteUtil;
 
 /**
@@ -29,7 +24,7 @@ public class SocketDataParse {
     private String currentMessageType;
 
     private byte[] longMessage;
-    
+
     private final SocketMessageReceiver mReceiver;
 
 
@@ -45,9 +40,9 @@ public class SocketDataParse {
         mParserThread.interrupt();
         mParserThread=null;
     }
-    
-    
-   
+
+
+
 
 
     private class ParserThread extends Thread{
@@ -71,11 +66,11 @@ public class SocketDataParse {
 
 
     private void parseMessage(byte[] message) {
-        
+
 
         //小于2，完全无法解析
         if (message.length < 2 && message.length > 0) {
-           
+
             if (currentMessage == null) {//不需要补足
                 currentMessage = message;
             } else if (currentMessage != null && lessDataLength == 0) {//有不足的数据，但是没有缺少数据的量
@@ -110,7 +105,7 @@ public class SocketDataParse {
 
             //截取前两个
             String head = new String(ByteUtil.cutBytes(message, 0, 2));
-            
+
             int length;
             //有消息头的代表之前的消息完全解析完
             //是心跳消息
@@ -143,8 +138,8 @@ public class SocketDataParse {
                         currentMessageType = head;
                         //设置剩余消息数量
                         lessDataLength = length + 6 - message.length;
-                        
-                      
+
+
 
                     }
 
@@ -153,7 +148,7 @@ public class SocketDataParse {
                     currentMessage = message;
                     //设置当前的消息类型
                     currentMessageType = head;
-                  
+
 
                 }
 
@@ -197,13 +192,13 @@ public class SocketDataParse {
                     currentMessage = message;
                     //设置当前的消息类型
                     currentMessageType = head;
-                  
+
 
                 }
 
             } else if (SocketDataType.ME.equals(head)) {//是最后的长消息
 
-                
+
                 //是否可以解析出消息长度
                 if (message.length > 6) {
                     //解析出消息长度
@@ -292,8 +287,8 @@ public class SocketDataParse {
                 }
 
             }else if(currentMessage != null && lessDataLength ==0&&currentMessage.length<6){//数据无法解析头和长度
-               
-                
+
+
                 if(message.length>=6-currentMessage.length){//将头补全
                     int len=6 - currentMessage.length;
                     currentMessage=ByteUtil.unitByteArray(currentMessage, ByteUtil.cutBytes(message, 0, 6-currentMessage.length));
@@ -303,8 +298,8 @@ public class SocketDataParse {
                 }else{//添加之后还是解析出长度
                     currentMessage = ByteUtil.unitByteArray(currentMessage,message);
                 }
-                
-                
+
+
             }
 
         }
@@ -317,36 +312,42 @@ public class SocketDataParse {
      * @param bytes
      */
     private void parseCompleteData(byte[]bytes){
-             
+
         byte[] msg=ByteUtil.cutBytes(bytes,6,bytes.length);
 
         String type = new String(ByteUtil.cutBytes(bytes, 0, 2));
-         if(!SocketDataType.MH.equals(type)){
-            SocketData data= JSON.parseObject(msg,SocketData.class);
-             SocketMessage message =null;
-            if(MessageType.MT.equals(data.getMessageType())){
-                message=JSON.<SocketTextMessage>parseObject(data.getData(), SocketTextMessage.class);
-            }else if (MessageType.MV.equals(data.getMessageType())) {
-                 //音频数据
-                 message=JSON.<SocketVoiceMessage>parseObject(data.getData(), SocketVoiceMessage.class);
-             } else if (MessageType.MM.equals(data.getMessageType())) {
-                 //音频数据
-                 message=JSON.<SocketVideoMessage>parseObject(data.getData(), SocketVideoMessage.class);
-             } else if (MessageType.MP.equals(data.getMessageType())) {
-                 //图片数据
-                 message=JSON.<SocketImageMessage>parseObject(data.getData(), SocketImageMessage.class);
-             }else if (MessageType.MF.equals(data.getMessageType())) {
-                 //文件数据
-                 message = JSON.<SocketFileMessage>parseObject(data.getData(), SocketFileMessage.class);
-             }
-            
-             if (message != null) {
-                 SocketHelper.getInstance().receiverMessage(mReceiver.getReceiver(), message);
-             }
+        if(!SocketDataType.MH.equals(type)){
+            SocketDataProtos.SocketData data= null;
+            try {
+                data = SocketDataProtos.SocketData.parseFrom(msg);
+                SocketMessage message =null;
+                if(MessageType.MT.equals(data.getMessageType())){
+                    message=new SocketTextMessage(data);
+                }else if (MessageType.MV.equals(data.getMessageType())) {
+                    //音频数据
+                    message=new SocketVoiceMessage(data);
+                } else if (MessageType.MM.equals(data.getMessageType())) {
+                    //音频数据
+                    message=new SocketVideoMessage(data);
+                } else if (MessageType.MP.equals(data.getMessageType())) {
+                    //图片数据
+                    message=new SocketImageMessage(data);
+                }else if (MessageType.MF.equals(data.getMessageType())) {
+                    //文件数据
+                        message = new SocketFileMessage(data);
+                }
+
+                if (message != null) {
+                    SocketHelper.getInstance().receiverMessage(mReceiver.getReceiver(), message);
+                }
+
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+            }
         }
 
 
-       
+
 
     }
 

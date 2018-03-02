@@ -10,10 +10,10 @@ import socketconnect.message.SocketMessage;
 public interface MessageCallback {
 
 
-    void response(int messageId,String message);
+    void response(int messageId, String message);
     
     
-    void requestError(SocketMessage message,SocketException e);
+    void requestError(SocketMessage message, SocketException e);
 
 
 }

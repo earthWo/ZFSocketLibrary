@@ -2,7 +2,7 @@ package socketconnect.con;
 
 
 
-import java.io.File;
+
 import socketconnect.callback.CallbackSet;
 import socketconnect.callback.MessageCallback;
 import socketconnect.callback.SocketCallback;
@@ -46,10 +46,8 @@ public class SocketConnect {
        mSocketHelper.connect(); 
     }
 
-
-
     public void sendTextMessage(int socketId,String message){
-       mSocketHelper.sendTextMessage(socketId,CallbackSet.decodeMessageId(message),message);
+       mSocketHelper.sendTextMessage(socketId, CallbackSet.decodeMessageId(message),message);
     }
     
     public void sendVoiceMessage(int socketId, String fileName) {
@@ -59,8 +57,7 @@ public class SocketConnect {
     public void sendVideoMessage(int socketId, String fileName) {
         mSocketHelper.sendVideoMessage(socketId, CallbackSet.decodeMessageId(System.currentTimeMillis() + ""), fileName);
     }
-    
-    
+
     public void sendImageMessage(int socketId, String fileName) {
         mSocketHelper.sendImageMessage(socketId, CallbackSet.decodeMessageId(System.currentTimeMillis() + ""), fileName);
     }
@@ -69,13 +66,12 @@ public class SocketConnect {
         mSocketHelper.sendFileMessage(socketId, CallbackSet.decodeMessageId(System.currentTimeMillis() + ""), fileName);
     }
 
-    
     public void sendHeardMessage(int socketId) {
         mSocketHelper.sendHeardMessage(socketId, CallbackSet.decodeMessageId(System.currentTimeMillis()+""));
     }
 
     public void sendSyncTextMessage(int socketId,String message, MessageCallback callback){
-        int messageId=CallbackSet.decodeMessageId(message);
+        int messageId= CallbackSet.decodeMessageId(message);
         CallbackSet.get().addCallback(messageId,callback);
         mSocketHelper.sendTextMessage(socketId, messageId, message);
     }
@@ -97,8 +93,7 @@ public class SocketConnect {
         CallbackSet.get().addCallback(messageId, callback);
         mSocketHelper.sendImageMessage(socketId, messageId, fileName);
     }
-    
-    
+
     public void sendSyncFileMessage(int socketId, String fileName, MessageCallback callback) {
         int messageId = CallbackSet.decodeMessageId(System.currentTimeMillis() + "");
         CallbackSet.get().addCallback(messageId, callback);

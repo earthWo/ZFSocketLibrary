@@ -18,7 +18,7 @@ public interface SocketCallback {
     
     void disconnected(Connecter connecter);
     
-    void receiveMessage(SocketMessage message,Connecter connecter);
+    void receiveMessage(SocketMessage message, Connecter connecter);
 
 
 }

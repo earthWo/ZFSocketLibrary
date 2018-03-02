@@ -1,5 +1,14 @@
 package socketconnect.con;
 
+import socketconnect.callback.CallbackSet;
+import socketconnect.callback.MessageCallback;
+import socketconnect.callback.MessageType;
+import socketconnect.callback.SocketCallback;
+import socketconnect.exception.SocketException;
+import socketconnect.message.*;
+import socketconnect.model.Connecter;
+import socketconnect.utils.ByteUtil;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -9,19 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import socketconnect.callback.CallbackSet;
-import socketconnect.callback.MessageCallback;
-import socketconnect.callback.MessageType;
-import socketconnect.callback.SocketCallback;
-import socketconnect.exception.SocketException;
-import socketconnect.message.SocketFileMessage;
-import socketconnect.message.SocketImageMessage;
-import socketconnect.message.SocketMessage;
-import socketconnect.message.SocketTextMessage;
-import socketconnect.message.SocketVideoMessage;
-import socketconnect.message.SocketVoiceMessage;
-import socketconnect.model.Connecter;
-import socketconnect.utils.ByteUtil;
 
 /**
  * 负责socket的连接传输
@@ -101,16 +97,16 @@ public class SocketHelper {
         
     }
     
-    public void receiverMessage(Connecter connecter,SocketMessage message){
-        if (mSocketCallback != null) {
-            mSocketCallback.receiveMessage(message,connecter);
+    public void receiverMessage(Connecter connecter, SocketMessage message){
+        if (this.mSocketCallback != null) {
+            this.mSocketCallback.receiveMessage(message,connecter);
         } 
     }
     
     
-    public void sendMessageError(SocketMessage message,SocketException e){
+    public void sendMessageError(SocketMessage message, SocketException e){
         if(message!=null){
-            MessageCallback callback=CallbackSet.get().getCallback(message.getMessageId());
+            MessageCallback callback= CallbackSet.get().getCallback(message.getMessageId());
             if(callback!=null){
                 callback.requestError(message, e);
             }
@@ -145,7 +141,6 @@ public class SocketHelper {
             mConnecter.clear();
             servce.close();
             servce=null;
-            sInstance=null;
         } catch (IOException ex) {
             Logger.getLogger(SocketHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -186,7 +181,7 @@ public class SocketHelper {
                     throw new SocketException(e.getMessage());
                 }
             }
-            socketMessage.setVoiceName(fileName.substring(fileName.lastIndexOf("/")+1));
+            socketMessage.setText(fileName.substring(fileName.lastIndexOf("/")+1));
             SocketMessageSender.get(socketId).addMessage(socketMessage);
         }
     }
@@ -205,7 +200,7 @@ public class SocketHelper {
                     throw new SocketException(e.getMessage());
                 }
             }
-            socketMessage.setVedioName(fileName.substring(fileName.lastIndexOf("/")+1));
+            socketMessage.setText(fileName.substring(fileName.lastIndexOf("/")+1));
             SocketMessageSender.get(socketId).addMessage(socketMessage);
         }
     }
@@ -224,7 +219,7 @@ public class SocketHelper {
                     throw new SocketException(e.getMessage());
                 }
             }
-            socketMessage.setImageName(fileName.substring(fileName.lastIndexOf("/")+1));
+            socketMessage.setText(fileName.substring(fileName.lastIndexOf("/")+1));
             SocketMessageSender.get(socketId).addMessage(socketMessage);
         }
     }
@@ -244,7 +239,7 @@ public class SocketHelper {
                     throw new SocketException(e.getMessage());
                 }
             }
-            socketMessage.setFileName(fileName.substring(fileName.lastIndexOf("/")+1));
+            socketMessage.setText(fileName.substring(fileName.lastIndexOf("/")+1));
             SocketMessageSender.get(socketId).addMessage(socketMessage);
         }
     }
@@ -257,6 +252,7 @@ public class SocketHelper {
             socketMessage.setMessageId(messageId);
             socketMessage.setData("这是一个心跳".getBytes());
             socketMessage.setMessageType(MessageType.MH);
+            socketMessage.setText("这是一个心跳");
             SocketMessageSender.get(socketId).addMessage(socketMessage);
         }
     }
@@ -275,7 +271,6 @@ public class SocketHelper {
                     serviceStart();
                     while(true){
                        Socket s=servce.accept();
-                
                        connectSuccess(s);
                     }
                                       

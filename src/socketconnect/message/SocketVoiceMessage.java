@@ -1,11 +1,8 @@
 package socketconnect.message;
 
 
-import com.alibaba.fastjson.JSON;
-
-
-
 import socketconnect.callback.MessageType;
+import socketconnect.proto.SocketDataProtos;
 
 /**
  * Created by wuzefeng on 2017/10/17.
@@ -13,23 +10,14 @@ import socketconnect.callback.MessageType;
 
 public class SocketVoiceMessage extends SocketMessage{
 
-    private String voiceName;
-
-
-    public String getVoiceName() {
-        return voiceName;
-    }
-
-    public void setVoiceName(String voiceName) {
-        this.voiceName = voiceName;
-    }
 
     public SocketVoiceMessage() {
         setMessageType(MessageType.MV);
     }
 
-    @Override
-    public byte[] toByteArray() {
-       return JSON.toJSONBytes(this);
+    public SocketVoiceMessage(SocketDataProtos.SocketData socketData) {
+        this();
+        setSocketData(socketData);
     }
+
 }
