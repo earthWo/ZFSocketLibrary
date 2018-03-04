@@ -1,7 +1,18 @@
 package socketconnect.utils;
 
-import java.io.*;
+import com.google.protobuf.ByteString;
+import socketconnect.callback.SocketDataType;
+import socketconnect.message.SocketMessage;
+import socketconnect.proto.SocketDataProtos;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by wuzefeng on 2017/10/13.
@@ -91,6 +102,50 @@ public class ByteUtil {
             }
         }
         return buffer;
+    }
+
+
+    public static byte[][] getBytesByMessage(SocketMessage message){
+        byte[][]ms;
+        SocketDataProtos.SocketData socketData=SocketDataProtos.SocketData.newBuilder()
+                .setMessageId(message.getMessageId())
+                .setMessageType(message.getMessageType())
+                .setText(message.getText())
+                .setData(ByteString.copyFrom(message.getData()))
+                .build();
+        byte[]messageByte=socketData.toByteArray();
+        int messageLength=messageByte.length;
+        int len = 0;
+        //普通消息
+        if(message.getMessageType() == null ? SocketDataType.MH != null : !message.getMessageType().equals(SocketDataType.MH)){
+            //大于1000分包发送
+            if(messageLength>=256){
+
+
+                byte[][]msb=ByteUtil.splitBytes(messageByte,256);
+                ms=new byte[msb.length][];
+
+                for(int i=0;i<msb.length;i++){
+                    if(i==msb.length-1){
+                        ms[i]= ByteUtil.unitByteArray(ByteUtil.unitByteArray(SocketDataType.ME.getBytes(),ByteUtil.intToByteArray(msb[i].length)),msb[i]);
+                    }else{
+                        ms[i]= ByteUtil.unitByteArray(ByteUtil.unitByteArray(SocketDataType.ML.getBytes(),ByteUtil.intToByteArray(msb[i].length)),msb[i]);
+                    }
+                    len+=  ms[i].length;
+                }
+            }else{
+                ms=new byte[1][];
+                ms[0]= ByteUtil.unitByteArray(ByteUtil.unitByteArray(SocketDataType.MG.getBytes(),ByteUtil.intToByteArray(messageLength)),messageByte);
+                return ms;
+            }
+        }else{//心跳消息
+
+            ms=new byte[1][];
+            ms[0]= ByteUtil.unitByteArray(ByteUtil.unitByteArray(SocketDataType.MH.getBytes(),ByteUtil.intToByteArray(messageLength)),messageByte);
+            return ms;
+        }
+
+        return ms;
     }
 
 

@@ -1,5 +1,12 @@
 package socketconnect.con;
 
+import socketconnect.callback.MessageType;
+import socketconnect.exception.SocketException;
+import socketconnect.message.SocketMessage;
+import socketconnect.message.SocketTextMessage;
+import socketconnect.model.Connecter;
+import socketconnect.utils.ByteUtil;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -8,23 +15,13 @@ import java.util.Map;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import com.google.protobuf.ByteString;
-import socketconnect.callback.MessageType;
-import socketconnect.callback.SocketDataType;
-import socketconnect.exception.SocketException;
-import socketconnect.message.SocketMessage;
-import socketconnect.message.SocketTextMessage;
-import socketconnect.model.Connecter;
-import socketconnect.proto.SocketDataProtos;
-import socketconnect.utils.ByteUtil;
-
 /**
  * Created by wuzefeng on 2017/10/13.
  */
 
-public class SocketMessageSender {
-    
-    public static Map<Integer,SocketMessageSender>sMapSender=new HashMap<>();
+public class SocketFileSender {
+
+    public static Map<Integer,SocketFileSender>sMapSender=new HashMap<>();
 
     private BlockingDeque<SocketMessage>mMessageDeuqe;
 
@@ -32,8 +29,8 @@ public class SocketMessageSender {
 
     private Socket mSocket;
 
-    private SocketMessageSender(Connecter connecter) {
-        this.mSocket=connecter.getMessageSocket();
+    private SocketFileSender(Connecter connecter) {
+        this.mSocket=connecter.getFileSocket();
         mMessageDeuqe=new LinkedBlockingDeque<>();
         mThread=new SendThread();
         mThread.setName("发送消息线程");
@@ -42,13 +39,13 @@ public class SocketMessageSender {
     }
     
     
-    public static void createMessageSender(Connecter connecter){
-         SocketMessageSender sender=new SocketMessageSender(connecter);
+    public static void createFileSender(Connecter connecter){
+         SocketFileSender sender=new SocketFileSender(connecter);
         sMapSender.put(connecter.getSocketId(), sender);
     }
     
     
-    public static SocketMessageSender get(int socketId){
+    public static SocketFileSender get(int socketId){
         return sMapSender.get(socketId);
     }
     
@@ -91,7 +88,7 @@ public class SocketMessageSender {
 
     public static void closeThreads() {
         for (int key : sMapSender.keySet()) {
-            SocketMessageSender sender = sMapSender.get(key);
+            SocketFileSender sender = sMapSender.get(key);
             sender.closeThread();
         }
         sMapSender.clear();
@@ -99,7 +96,7 @@ public class SocketMessageSender {
     }
     
     public static void closeThread(Connecter connceter) {
-        SocketMessageSender sender = sMapSender.get(connceter.getSocketId());
+        SocketFileSender sender = sMapSender.get(connceter.getSocketId());
         if (sender != null) {
             sender.closeThread();
             sMapSender.remove(connceter.getSocketId());

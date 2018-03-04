@@ -17,46 +17,72 @@ public class Connecter {
     
     private int socketId;
     
-    private Socket socket;
+    private Socket messageSocket;
+
+    private Socket heartSocket;
+
+    private Socket fileSocket;
     
     
     public Connecter() {
         
     }
     
-    public Connecter(Socket socket){
-        this.socket=socket;
-        this.socketId=socket.hashCode();
-    }
-
-    public Socket getSocket() {
-        return socket;
+    public Socket getMessageSocket() {
+        return messageSocket;
     }
 
     public int getSocketId() {
         return socketId;
     }
 
-    public void setSocket(Socket socket) {
-        this.socket = socket;
+    public void setMessageSocket(Socket socket) {
+        this.messageSocket = socket;
     }
 
     public void setSocketId(int socketId) {
         this.socketId = socketId;
-    } 
-    
-    
-    public void closeSocket(){
-        if(socket!=null){
+    }
+
+    public Socket getHeartSocket() {
+        return heartSocket;
+    }
+
+    public void setHeartSocket(Socket heartSocket) {
+        this.heartSocket = heartSocket;
+    }
+
+    public Socket getFileSocket() {
+        return fileSocket;
+    }
+
+    public void setFileSocket(Socket fileSocket) {
+        this.fileSocket = fileSocket;
+    }
+
+    public void closeConnect(){
+        if(messageSocket!=null){
             try {
-                socket.close();
+                messageSocket.close();
+            } catch (IOException ex) {
+            }
+        }
+        if(heartSocket!=null){
+            try {
+                heartSocket.close();
+            } catch (IOException ex) {
+            }
+        }
+        if(fileSocket!=null){
+            try {
+                fileSocket.close();
             } catch (IOException ex) {
             }
         }
     }
     
     public String getConnectorName(){
-        return "连接者"+socketId;
+        return "连接者"+hashCode();
     }
     
     

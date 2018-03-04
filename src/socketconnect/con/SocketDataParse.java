@@ -1,10 +1,18 @@
 package socketconnect.con;
 
 
+import com.alibaba.fastjson.JSON;
 import com.google.protobuf.InvalidProtocolBufferException;
+import socketconnect.callback.CallbackSet;
 import socketconnect.callback.MessageType;
 import socketconnect.callback.SocketDataType;
-import socketconnect.message.*;
+import socketconnect.message.SocketFileMessage;
+import socketconnect.message.SocketImageMessage;
+import socketconnect.message.SocketMessage;
+import socketconnect.message.SocketTextMessage;
+import socketconnect.message.SocketVideoMessage;
+import socketconnect.message.SocketVoiceMessage;
+import socketconnect.model.ReceiveInterface;
 import socketconnect.proto.SocketDataProtos;
 import socketconnect.utils.ByteUtil;
 
@@ -25,10 +33,10 @@ public class SocketDataParse {
 
     private byte[] longMessage;
 
-    private final SocketMessageReceiver mReceiver;
+    private final ReceiveInterface mReceiver;
 
 
-    public SocketDataParse(SocketMessageReceiver receiver) {
+    public SocketDataParse(ReceiveInterface receiver) {
         mParserThread=new ParserThread();
         mParserThread.start();
         mParserThread.setName("解析线程");
@@ -344,6 +352,8 @@ public class SocketDataParse {
             } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
             }
+        }else {
+            SocketHelper.getInstance().sendHeardMessage(mReceiver.getReceiver().getSocketId(), CallbackSet.decodeMessageId(System.currentTimeMillis() + ""));
         }
 
 

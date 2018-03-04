@@ -47,7 +47,7 @@ public class SocketConnect {
     }
 
     public void sendTextMessage(int socketId,String message){
-       mSocketHelper.sendTextMessage(socketId, CallbackSet.decodeMessageId(message),message);
+       mSocketHelper.sendTextMessage(socketId,CallbackSet.decodeMessageId(message),message);
     }
     
     public void sendVoiceMessage(int socketId, String fileName) {
@@ -71,7 +71,7 @@ public class SocketConnect {
     }
 
     public void sendSyncTextMessage(int socketId,String message, MessageCallback callback){
-        int messageId= CallbackSet.decodeMessageId(message);
+        int messageId=CallbackSet.decodeMessageId(message);
         CallbackSet.get().addCallback(messageId,callback);
         mSocketHelper.sendTextMessage(socketId, messageId, message);
     }

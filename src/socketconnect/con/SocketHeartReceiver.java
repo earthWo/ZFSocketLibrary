@@ -1,6 +1,9 @@
 package socketconnect.con;
 
 
+import socketconnect.model.Connecter;
+import socketconnect.model.ReceiveInterface;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -9,32 +12,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import socketconnect.model.Connecter;
-import socketconnect.model.ReceiveInterface;
 
 /**
  * Created by wuzefeng on 2017/10/13.
  */
 
-public class SocketMessageReceiver implements ReceiveInterface {
+public class SocketHeartReceiver implements ReceiveInterface{
 
     private Socket mSocket;
 
     private ReceiverThread mReceiverThread;
-    
+
     private SocketDataParse mParse;
-    
+
     private Connecter mConnecter;
-    
-    public static Map<Integer, SocketMessageReceiver> sMapReceiver = new HashMap<>();
+
+    public static Map<Integer, SocketHeartReceiver> sMapReceiver = new HashMap<>();
 
 
 
-    private SocketMessageReceiver(Connecter connecter) {
+    private SocketHeartReceiver(Connecter connecter) {
         this.mConnecter=connecter;
-        this.mSocket = connecter.getMessageSocket();
+        this.mSocket = connecter.getHeartSocket();
         mReceiveQueue=new LinkedBlockingQueue<>();
         mReceiverThread=new ReceiverThread();
         mReceiverThread.setName("接收线程");
@@ -62,7 +61,7 @@ public class SocketMessageReceiver implements ReceiveInterface {
    
     public static void closeThreads() {
         for (int key : sMapReceiver.keySet()) {
-            SocketMessageReceiver sender = sMapReceiver.get(key);
+            SocketHeartReceiver sender = sMapReceiver.get(key);
             sender.closeThread();
         }
         sMapReceiver.clear();
@@ -77,13 +76,13 @@ public class SocketMessageReceiver implements ReceiveInterface {
     }
     
     public static void createMessageReceiver(Connecter connecter) {
-        SocketMessageReceiver receiver = new SocketMessageReceiver(connecter);
+        SocketHeartReceiver receiver = new SocketHeartReceiver(connecter);
         sMapReceiver.put(connecter.getSocketId(), receiver);
     }
     
     
     public static void closeThread(Connecter connceter) {
-        SocketMessageReceiver receiver = sMapReceiver.get(connceter.getSocketId());
+        SocketHeartReceiver receiver = sMapReceiver.get(connceter.getSocketId());
         if(receiver!=null){
             receiver.closeThread();
             sMapReceiver.remove(connceter.getSocketId());
@@ -100,7 +99,7 @@ public class SocketMessageReceiver implements ReceiveInterface {
         @Override
         public void run() {
             try {
-                mParse = new SocketDataParse(SocketMessageReceiver.this);
+                mParse = new SocketDataParse(SocketHeartReceiver.this);
                 InputStream inputStream = mSocket.getInputStream();
                 while(true){
                     byte[] buffer = new byte[256];

@@ -1,9 +1,8 @@
 package socketconnect.callback;
 
-import socketconnect.con.SocketConnect;
-
 import java.util.HashMap;
 import java.util.Map;
+import socketconnect.con.SocketConnect;
 
 /**
  * Created by wuzefeng on 2017/10/13.
@@ -40,7 +39,7 @@ public class CallbackSet {
     }
 
     public MessageCallback getCallback(int key){
-        MessageCallback callback =mMessageCallbackMap.get(key);
+        MessageCallback  callback =mMessageCallbackMap.get(key);
         if(callback!=null){
             mMessageCallbackMap.remove(key);
         }
